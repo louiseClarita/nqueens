@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity } from '
 import { auth } from "C:\\Users\\Pc\\Desktop\\CH\\Lebanese University\\CS M1\\Semester 8\\info438 - android\\Prject\\NQueen\\nqueens\\firebase.js";
 import { useNavigation } from '@react-navigation/native';
 import ChessGame from './ChessComponent';
+import MyMenu from './Menu';
 
 
 
@@ -15,7 +16,7 @@ const handleSignOut = () =>{
    auth
    .signOut()
    .then(() =>{
-      navigation.navigate("Login")
+      navigation.navigate("Root",{screen: 'Login'});
       console.log("Logged out! " );
 
    })
@@ -28,14 +29,13 @@ const GoToMyToDo = () =>{
 } 
    return (
    <View style={styles.container}>
-
+       <ChessGame></ChessGame>
    <Text>Email: {auth.currentUser?.email} </Text>
    <TouchableOpacity style={styles.button}>
       <Text style={styles.buttonText} onPress={handleSignOut}>Sign Out!</Text>
    </TouchableOpacity>
 
-  
-   <ChessGame></ChessGame>
+ 
    
    </View>
    
@@ -55,7 +55,7 @@ container: {
 
 button : {
    backgroundColor: '#0782F9',
-   width:'20%',
+   width:'30%',
    paddingHorizontal:15,
    borderRadius:10,
    margin: 8,

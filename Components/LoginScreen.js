@@ -16,11 +16,10 @@ const [password,setPassword]=useState('')
 const navigation = useNavigation()
 
 
-
 useEffect(() => {
  unsubscribe = auth.onAuthStateChanged( user =>{
        if (user) {
-   navigation.navigate("Home")
+ navigation.navigate("Root",{screen: 'Home'});
         }
 
    })

@@ -294,7 +294,7 @@ const ChessGame = () => {
 
       <View style={styles.container}>
 
-        <TouchableOpacity style={styles.button} onPress={() => startGame(8)}>
+        <TouchableOpacity style={styles.button} onPress={() => startGame(4)}>
 
           <Text style={styles.buttonText}>Start Game</Text>
 
@@ -492,6 +492,7 @@ const ChessGame = () => {
 
 
 
+
 const styles = StyleSheet.create({
 
   container: {
@@ -503,6 +504,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     backgroundColor: '#fff',
+    width:'100%',
+
 
   },
 
@@ -645,9 +648,5 @@ const styles = StyleSheet.create({
  
 
 });
-
-
-
-
 export default ChessGame;
 
