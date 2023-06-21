@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-
-// import queenImage from '../assets/images/Queen.jpg';
-
+import { StyleSheet, Text, View, TouchableOpacity,TextInput,TouchableWithoutFeedback,Keyboard } from 'react-native';
+import { Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useNavigation } from '@react-navigation/native';
+// import { createRecord } from '../src/AddGame';
 
-
-
-
+import { db,auth, firebase } from '../firebase';
+const screenWidth = Dimensions.get('window').width;
 
 const ChessGame = () => {
 
@@ -17,16 +16,34 @@ const ChessGame = () => {
   const [n, setN] = useState(0);
 
 
-
+  const [showContainer, setShowContainer] = useState(true);
 
   const [ChessN, setChessN] = useState(0);
 
   const [score, setScore] = useState(0);
+  const navigation = useNavigation()
+  useEffect(() => {
+    unsubscribe = auth.onAuthStateChanged( user =>{
+          if (user) 
+            setUser(user);
+   
+      });
+      return unsubscribe
+   }, [])
+   
+  const handleSignOut = () =>{
+    console.log("Logged out f! " );
+    auth
+    .signOut()
+    .then(() =>{
+       navigation.navigate("Root",{screen:'Sign In'});
+       console.log("Logged out! " );
+ 
+    })
+    .catch(error => alert(error.message))
+ }
 
-
-
-
-
+  
   const initializeGame = (boardSize) => {
 
     const newChessboard = Array(boardSize).fill().map(() => Array(boardSize).fill(0));
@@ -286,68 +303,67 @@ const ChessGame = () => {
   };
 
 
-
+  
 
   const drawBoard = () => {
 
     return (
 
       <View style={styles.container}>
+    <Text style={styles.emailText}>Email: {auth.currentUser?.email}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => startGame(4)}>
+    {showContainer && (
+    <View style={styles.inputContainer}>
+       
+       
+        <Text style={styles.inputLabel}>Board Size:</Text>
+        <TextInput
+  style={styles.input}
+  placeholder="Enter board size"
+  keyboardType="numeric"
+  onChangeText={(text) => {
+    const parsedValue = parseInt(text);
+    if (!isNaN(parsedValue)) {
+      setN(parsedValue);
+    }
+  }}
+ 
+/>
+</View>
+      )}
+<View >
 
-          <Text style={styles.buttonText}>Start Game</Text>
+  <TouchableOpacity onPress={() => startGame(8)}>
+    <Text style={[styles.buttonText,styles.buttons]}>New Game</Text>
+  </TouchableOpacity>
 
-        </TouchableOpacity>
+</View>
 
-        <Text style={styles.scoreText}>Score: {score}</Text>
+<Text style={styles.scoreText}>Score: {score}</Text>
 
-        <View style={styles.board}>
 
-          {chessboard.map((row, rowIndex) => (
-
-            <View key={rowIndex} style={styles.row}>
-
-              {row.map((cell, colIndex) => (
-
-                <TouchableOpacity
-
-                  key={colIndex}
-
-                  style={[
-
-                    styles.cell,
-
-                    (rowIndex + colIndex) % 2 === 0 ? styles.whiteCell : styles.grayCell,
-
-                  ]}
-
-                  onPress={() => handleBoardClick(rowIndex, colIndex)}
-
-                >
-
-                 
-
-                  {cell === 1 && (
-
-                    <View style={styles.queenContainer}>
-
-                      <Icon name="chess-queen" style={styles.queenIcon} />
-
-                    </View>
-
-                  )}
-
-                </TouchableOpacity>
-
-              ))}
-
-            </View>
-
-          ))}
-
-        </View>
-
+<View style={styles.board}>
+        {chessboard.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.row}>
+            {row.map((cell, colIndex) => (
+              <TouchableOpacity
+                key={colIndex}
+                style={[
+                  styles.cell,
+                  (rowIndex + colIndex) % 2 === 0 ? styles.whiteCell : styles.grayCell,
+                ]}
+                onPress={() => handleBoardClick(rowIndex, colIndex)}
+              >
+                {cell === 1 && (
+                  <View style={styles.queenContainer}>
+                    <Icon name="chess-queen" style={styles.queenIcon} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </View>
       </View>
 
     );
@@ -358,10 +374,23 @@ const ChessGame = () => {
 
  
 
- 
+  const createRecord = async (data) => {
+    try {
+      const collectionRef = db.collection('Games');
+      // Add the data to the collection
+      await collectionRef.add(data);
+      console.log('Record created successfully!');
+    } catch (error) {
+      console.error('Error creating record:', error);
+    }
+  };
 
 
-
+  const handleCreateRecord = (data) => {
+   
+    console.log('before creation');
+    createRecord(data);
+  };
 
 
   const handleBoardClick = (row, col) => {
@@ -398,8 +427,21 @@ const ChessGame = () => {
 
         alert('Game Over, your score is '+ score);
 
-        setTimeout(() => {
 
+        const currentDate = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        setTimeout(() => {
+          const data = {
+            email: auth.currentUser.email,
+            type: 'One Game',
+            N: '8',
+            result: 'lost',
+            score: score,
+            date: currentDate.toLocaleString('en-US', options),
+
+          };
+          console.log(data);
+          handleCreateRecord(data);
           resetGame();
 
           console.log('3 seconds have passed');
@@ -452,7 +494,7 @@ const ChessGame = () => {
 
 
   const resetGame = () => {
-
+    setShowContainer(true);
     setN(0);
 
     setChessboard([]);
@@ -467,7 +509,8 @@ const ChessGame = () => {
 
 
   const startGame = (boardSize) => {
-
+    setShowContainer(false);
+    setScore(0);
     initializeGame(boardSize);
 
   };
@@ -490,25 +533,30 @@ const ChessGame = () => {
 };
 
 
-
-
+const cellSize = screenWidth / 8;
 
 const styles = StyleSheet.create({
 
-  container: {
-
-    flex: 1,
-
-    justifyContent: 'center',
-
+  
+  inputContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-
-    backgroundColor: '#fff',
-    width:'100%',
-
-
+    marginBottom: 10,
+    width:200,
   },
-
+  inputLabel: {
+    marginRight: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
   button: {
 
     padding: 10,
@@ -530,7 +578,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
 
   },
-
+  buttons: {
+    borderColor: '#4d79ff',
+    borderRadius: 35,
+    alignItems: 'center',
+    borderWidth:2,
+    margin:5,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
+    backgroundColor: '#4d79ff',
+},
+buttonsGrey: {
+  borderColor: '#4d79ff',
+  borderRadius: 35,
+  alignItems: 'center',
+  borderWidth:2,
+  margin:5,
+  alignSelf: 'flex-end',
+  padding: 10,
+  elevation: 2,
+  marginTop: 10,
+  backgroundColor: '#999999',
+},
   row: {
 
     flexDirection: 'row',
@@ -538,16 +608,10 @@ const styles = StyleSheet.create({
   },
 
   cell: {
-
-    width: 50,
-
-    height: 50,
-
+    width: cellSize,
+    height: cellSize,
     justifyContent: 'center',
-
-    alignItems: 'center',
-
-  },
+    alignItems: 'center',},
 
   whiteCell: {
 
@@ -602,7 +666,7 @@ const styles = StyleSheet.create({
   container: {
 
     flex: 1,
-
+    width:'100%',
     justifyContent: 'center',
 
     alignItems: 'center',
@@ -644,9 +708,48 @@ const styles = StyleSheet.create({
   },
 
  
-
- 
+  emailText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginBottom: 10,
+  },
+  button: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  startButton: {
+    backgroundColor: '#FF5722', // Blue color for Start New Game button
+  },
+  signOutButton: {
+    backgroundColor: '#2196F3', // Orange color for Sign Out button
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  scoreText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#666',
+  },
 
 });
+
+
+
+
 export default ChessGame;
 

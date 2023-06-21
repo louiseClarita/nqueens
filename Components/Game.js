@@ -7,6 +7,9 @@ const Game = ({ item }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
+
+
+    
     <View style={styles.genres}>
       <View style={styles.genre}>
         <View key={item.id} style={styles.genreContent}>
@@ -24,10 +27,10 @@ const Game = ({ item }) => {
             }}>
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                <Text style={styles.modalText}>{item.result}</Text>
-                <Text style={styles.modalText}>{item.date}</Text>
-                <Text style={styles.modalText}>{item.score}</Text>
-                <Text style={styles.modalText}>{item.N}</Text>
+                <Text>Result : </Text><Text style={styles.modalText}>{item.result}</Text>
+                <Text>Played On : </Text><Text style={styles.modalText}>{item.date}</Text>
+                <Text>Score : </Text><Text style={styles.modalText}>{item.score}</Text>
+                <Text>Board Size : </Text><Text style={styles.modalText}>{item.N}</Text>
 
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
@@ -52,33 +55,39 @@ export default Game;
 
 const styles = StyleSheet.create({
   genres: {
-    borderColor: '#0782F9',
-    borderWidth: 2,
-    width: '100%',
-    borderRadius: 17,
+    backgroundColor:'#f2f2f2',
+    width: '98%',
     justifyContent: 'center',
-    marginVertical: 4,
+    margin: 4,
+    
+    
   },
   genre: {
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 10,
+    flexDirection: 'row',
     borderColor: '#ccc',
-    marginRight: 4,
     marginBottom: 1,
+    alignItems: 'center',
   },
   genreContent: {
-    padding: 10,
+    margin:10,
+    alignItems: 'center',
   },
   genreText: {
+    padding:5,
+    margin:5,
+    float:'Left',
+    display:"flex",
     fontSize: 12,
     opacity: 0.7,
-    marginTop: 2,
+    justifyContent: 'center',
   },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+   
   },
   modalView: {
     backgroundColor: 'white',
@@ -95,13 +104,16 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   button: {
+    alignItems: 'center',
     borderRadius: 20,
+    alignSelf: 'flex-end',
+    marginBottom:5,
     padding: 10,
     elevation: 2,
     marginTop: 10,
   },
   buttonOpen: {
-    backgroundColor: '#0782F9',
+    backgroundColor: '#4d79ff',
   },
   buttonClose: {
     backgroundColor: '#2196F3',

@@ -1,17 +1,20 @@
 
 import { StyleSheet, Text, View,button, TextInput ,buttonText,TouchableOpacity,KeyboardAvoidingView ,buttonOutlineText,buttonOutline,buttonContainer, Image} from 'react-native'
 import React, {useState , useEffect} from 'react';
-import { auth } from 'C:\\Users\\Pc\\Desktop\\CH\\Lebanese University\\CS M1\\Semester 8\\info438 - android\\Prject\\NQueen\\nqueens\\firebase.js';
+import { auth, db } from 'C:\\Users\\Pc\\Desktop\\CH\\Lebanese University\\CS M1\\Semester 8\\info438 - android\\Prject\\NQueen\\nqueens\\firebase.js';
 import { useNavigation } from '@react-navigation/native';
+import { DatePickerIOSBase } from 'react-native';
 
 
 
 
-const LoginScreen = () => {
+const SignUp = () => {
 
-
-const [email,setEmail]=useState('')
-const [password,setPassword]=useState('')
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [birthday, setBirthday] = useState(new Date());
 
 const navigation = useNavigation()
 
@@ -26,39 +29,51 @@ useEffect(() => {
    return unsubscribe
 }, [])
 
-
+const handleDateChange = (date) => {
+    setBirthday(date);
+  };
+  
 
 const handleSignUp = () =>{
+    console.log("user.email" );
+
 auth
 .createUserWithEmailAndPassword(email,password)
 .then(userCredentials =>{
 const user = userCredentials.user;
 console.log(user.email);
+db.collection('users')
+   .doc(user.uid)
+   .set({
+     email: user.email,
+     firstName,
+     lastName,
+   })
+   .then(() => {
+     // Additional user information stored successfully
+     Alert.alert('Registration Successful');
+     // Clear form fields
+     setEmail('');
+     setPassword('');
+     setFirstName('');
+     setLastName('');
+   })
+   .catch((error) => {
+     // Error storing additional user information
+     Alert.alert('Error', error.message);
+   });
 
 })
 .catch(error => alert(error.message))
 }
 
-const ToRegister = () =>{
-   navigation.navigate('Register');
+const ToLogin = () =>{
+    navigation.navigate('Root',{screen:'Sign In'});
 
-  }
-
-const handleLogin = () =>{
-   auth
-   .signInWithEmailAndPassword(email,password)
-   .then(userCredentials =>{
-   const user = userCredentials.user;
-   console.log("Logged in with " + user.email);
-   
-   })
-   .catch(error => alert(error.message))
    }
 
 
-const GoToMyToDo = () =>{
-   navigation.navigate('MyTodos')
-}   
+ 
    return (
    <KeyboardAvoidingView
    style = {styles.container}
@@ -80,17 +95,31 @@ const GoToMyToDo = () =>{
           secureTextEntry
 
           />
-   </View>
+   
+   <TextInput
+        placeholder="First Name"
+        value={firstName} 
+        style={styles.input}
+        onChangeText={setFirstName}
+      />
+      <TextInput
+        placeholder="Last Name"
+        value={lastName}
+        style={styles.input}
+        onChangeText={setLastName}
+      />
 
+      </View>
    <View style={styles.buttonContainer}>
- 
-   <TouchableOpacity  onPress={handleLogin} style={styles.button}>
+   <TouchableOpacity  onPress={handleSignUp} style={styles.button}>
+   <Text style={styles.buttonOutlineText}>Register</Text>
+   </TouchableOpacity>
+
+   <TouchableOpacity  onPress={ToLogin} style={[styles.button, styles.buttonOutline]}>
    <Text style={styles.buttonText}>Login</Text>
     </TouchableOpacity>
 
-  <TouchableOpacity  onPress={ToRegister} style={[styles.button, styles.buttonOutline]}>
-   <Text style={styles.buttonOutlineText}>Register</Text>
-   </TouchableOpacity>
+
    </View>
 
 
@@ -103,7 +132,7 @@ const GoToMyToDo = () =>{
 
 
 }
-export default LoginScreen
+export default SignUp
 const styles = StyleSheet.create({
 
 container: {

@@ -1,42 +1,19 @@
-import { DrawerContentScrollView } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import { TouchableOpacity, Text } from 'react-native';
+import React from 'react';
+import { auth } from 'C:\\Users\\Pc\\Desktop\\CH\\Lebanese University\\CS M1\\Semester 8\\info438 - android\\Prject\\NQueen\\nqueens\\firebase.js';
 
-
-
-  
-  const Signout = ({ navigation }) => {
-    const user = auth.currentUser;
-    const userEmail = user?.email;
-    const handleSignOut = () =>{
-        auth
-        .signOut()
-        .then(() =>{
-           navigation.navigate("Login")
-           console.log("Logged out! " );
-     
-        })
-        .catch(error => alert(error.message))
-     }
-
-    return (
-      <DrawerContentScrollView>
-      {userEmail && (
-        <View style={{ padding: 16 }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>
-            User Email: {userEmail}
-          </Text>
-        </View>
-      )}
-        <Drawer.Screen name="Home" component={HomeScreen} />
-      
-      <DrawerItem
-        label="Custom Button"
-        onPress={handleSignOut}
-        icon={() => <Icon name="custom-icon" />}
-      />
-      </DrawerContentScrollView>
-    );
+const Signout = () => {
+  const handleSignOut = () => {
+    try {
+      auth.signOut();
+      console.log('Logged out successfully!');
+    } catch (error) {
+      console.error('Error occurred during sign out:', error);
+    }
   };
-  
-export default Signout
+
+  handleSignOut();
+
+  return null; // Render null or any other minimal content if required
+};
+
+export default Signout;

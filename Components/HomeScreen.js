@@ -10,19 +10,30 @@ import MyMenu from './Menu';
 const HomeScreen = () => {
 
 
-
+const user = auth.currentUser;
+const userEmail = user?.email;
 const navigation = useNavigation()
 const handleSignOut = () =>{
+
+   console.log("Logged out " + user );
+
    auth
+
    .signOut()
+
    .then(() =>{
-      navigation.navigate("Root",{screen: 'Login'});
+
+      //navigation.navigate("Login")
+
       console.log("Logged out! " );
 
-   })
-   .catch(error => alert(error.message))
-}
 
+
+   })
+
+   .catch(error => alert(error.message))
+
+}
 
 const GoToMyToDo = () =>{
  //  navigation.navigate('MyTodos')
@@ -30,10 +41,8 @@ const GoToMyToDo = () =>{
    return (
    <View style={styles.container}>
        <ChessGame></ChessGame>
-   <Text>Email: {auth.currentUser?.email} </Text>
-   <TouchableOpacity style={styles.button}>
-      <Text style={styles.buttonText} onPress={handleSignOut}>Sign Out!</Text>
-   </TouchableOpacity>
+
+ 
 
  
    
@@ -51,6 +60,7 @@ container: {
    justifyContent: 'center',
    alignItems: 'center',
    width:'100%',
+   padding:10,
 },
 
 button : {
